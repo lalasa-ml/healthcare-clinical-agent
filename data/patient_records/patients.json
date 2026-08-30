@@ -1,0 +1,198 @@
+[
+  {
+    "patient_id": "P-101",
+    "demographics": {
+      "name": "Jane Doe",
+      "age": 62,
+      "gender": "Female"
+    },
+    "history": [
+      "Type 2 Diabetes Mellitus (Diagnosed 2018)",
+      "Essential Hypertension (Diagnosed 2020)"
+    ],
+    "medications": [
+      {
+        "name": "Metformin",
+        "dosage": "1000mg Daily"
+      },
+      {
+        "name": "Lisinopril",
+        "dosage": "10mg Daily"
+      }
+    ],
+    "recent_labs": [
+      {
+        "test": "HbA1c",
+        "value": "8.2%",
+        "status": "High",
+        "date": "2026-02-10"
+      },
+      {
+        "test": "Serum Creatinine",
+        "value": "1.1 mg/dL",
+        "status": "Normal",
+        "date": "2026-02-10"
+      },
+      {
+        "test": "eGFR",
+        "value": "68 mL/min",
+        "status": "Normal",
+        "date": "2026-02-10"
+      }
+    ]
+  },
+  {
+    "patient_id": "P-102",
+    "demographics": {
+      "name": "Robert Chen",
+      "age": 71,
+      "gender": "Male"
+    },
+    "history": [
+      "Type 2 Diabetes Mellitus (Diagnosed 2017)",
+      "Chronic Kidney Disease Stage 4 (Diagnosed 2023)"
+    ],
+    "medications": [
+      {
+        "name": "Metformin",
+        "dosage": "1000mg Twice Daily"
+      }
+    ],
+    "allergies": [
+      "Penicillin"
+    ],
+    "recent_labs": [
+      {
+        "test": "HbA1c",
+        "value": "8.5%",
+        "status": "High",
+        "date": "2026-02-15"
+      },
+      {
+        "test": "Serum Creatinine",
+        "value": "2.4 mg/dL",
+        "status": "High",
+        "date": "2026-02-15"
+      },
+      {
+        "test": "eGFR",
+        "value": "24 mL/min",
+        "status": "Severely Low",
+        "date": "2026-02-15"
+      }
+    ]
+  },
+  {
+    "patient_id": "P-103",
+    "demographics": {
+      "name": "Maria Garcia",
+      "age": 54,
+      "gender": "Female"
+    },
+    "history": [
+      "Type 2 Diabetes Mellitus (Diagnosed 2024)"
+    ],
+    "medications": [
+      {
+        "name": "Metformin",
+        "dosage": "500mg Daily"
+      }
+    ],
+    "allergies": [],
+    "recent_labs": [
+      {
+        "test": "HbA1c",
+        "value": "11.2%",
+        "status": "Critically High",
+        "date": "2026-02-18"
+      },
+      {
+        "test": "Serum Creatinine",
+        "value": "0.9 mg/dL",
+        "status": "Normal",
+        "date": "2026-02-18"
+      },
+      {
+        "test": "eGFR",
+        "value": "85 mL/min",
+        "status": "Normal",
+        "date": "2026-02-18"
+      }
+    ],
+    "symptoms": [
+      "Polyuria (excessive urination)",
+      "Polydipsia (excessive thirst)",
+      "Unintentional weight loss (4 kg in past month)"
+    ]
+  },
+  {
+    "patient_id": "P-104",
+    "demographics": {
+      "name": "David Miller",
+      "age": 65,
+      "gender": "Male"
+    },
+    "history": [
+      "Type 2 Diabetes Mellitus",
+      "Essential Hypertension"
+    ],
+    "medications": [
+      {
+        "name": "Metformin",
+        "dosage": "1000mg Daily"
+      },
+      {
+        "name": "Lisinopril",
+        "dosage": "20mg Daily"
+      }
+    ],
+    "allergies": [],
+    "recent_labs": [
+      {
+        "test": "HbA1c",
+        "value": "8.9%",
+        "status": "High",
+        "date": "2026-08-29"
+      },
+      {
+        "test": "eGFR",
+        "value": "35 mL/min",
+        "status": "Low",
+        "date": "2026-08-29"
+      },
+      {
+        "test": "Serum Creatinine",
+        "value": "2.0 mg/dL",
+        "status": "Normal",
+        "date": "2026-08-29"
+      }
+    ],
+    "symptoms": [
+      "Polyuria",
+      "Polydipsia",
+      "Fatigue"
+    ]
+  },
+  {
+    "patient_id": "P-999",
+    "demographics": {
+      "name": "Test Patient",
+      "age": 40,
+      "gender": "Male"
+    },
+    "history": [
+      "Hypertension"
+    ],
+    "medications": [
+      {
+        "name": "Lisinopril",
+        "dosage": "10mg Daily"
+      }
+    ],
+    "allergies": [
+      "Aspirin"
+    ],
+    "recent_labs": [],
+    "symptoms": []
+  }
+]

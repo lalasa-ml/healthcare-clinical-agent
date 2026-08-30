@@ -1,0 +1,13 @@
+HOSPITAL CLINICAL GUIDELINE: MANAGEMENT OF TYPE 2 DIABETES MELLITUS
+
+1. Glycemic Targets:
+- Target HbA1c for non-pregnant adults: < 7.0%.
+- If HbA1c > 8.0%, evaluate current regimen and consider dual therapy escalation.
+
+2. Medication Guidelines:
+- First-line therapy: Metformin (unless contraindicated by severe renal impairment).
+- If HbA1c remains > 8.0% on Metformin monotherapy: Consider adding GLP-1 receptor agonist or SGLT2 inhibitor.
+- Patient Renal Safety Guardrail: Monitor eGFR annually. If eGFR drops below 45 mL/min, reduce Metformin dosage; discontinue if eGFR < 30 mL/min.
+
+3. Escalation Protocols:
+- Any patient presenting with HbA1c > 10.0% or active symptoms of severe hyperglycemia requires immediate physician review.

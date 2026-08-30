@@ -1,0 +1,16 @@
+[
+  {
+    "eval_id": "TC-01",
+    "prompt": "Summarize recent history and check diabetes guideline recommendations for Metformin escalation.",
+    "patient_id": "P-101",
+    "expected_tools": ["get_patient_record", "search_clinical_guidelines"],
+    "expected_grounding_keywords": ["HbA1c", "8.2%", "dual therapy escalation"]
+  },
+  {
+    "eval_id": "TC-02",
+    "prompt": "What is the peak flow for John Smith?",
+    "patient_id": "P-102",
+    "expected_tools": ["get_patient_record"],
+    "expected_grounding_keywords": ["Peak Flow", "350 L/min"]
+  }
+]
