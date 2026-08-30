@@ -4,7 +4,7 @@ import json
 import os
 
 # Dynamic API URL resolution (Docker vs Local)
-API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
+API_BASE_URL = "https://clinical-api-backend-app.azurewebsites.net"
 # Absolute path to root project directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PATIENTS_FILE = os.path.join(BASE_DIR, "data", "patient_records", "patients.json")
