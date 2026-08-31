@@ -516,8 +516,10 @@ class ClinicalAgent:
                 except json.JSONDecodeError:
                     arguments = {}
 
-                if tool_name == "get_patient_record" and resolved_pid:
-                    arguments["patient_id"] = resolved_pid
+                # FIX: Only set default patient_id if not explicitly provided by LLM tool arguments
+                if tool_name == "get_patient_record" and "patient_id" not in arguments:
+                    if resolved_pid:
+                        arguments["patient_id"] = resolved_pid
 
                 tool_result = self._execute_tool(tool_name, arguments)
 
