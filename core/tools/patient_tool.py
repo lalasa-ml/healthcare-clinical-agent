@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -6,13 +7,11 @@ from typing import Any
 # Patient data file path resolution
 # ---------------------------------------------------------
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-PATIENTS_FILE_PATH = (
-    PROJECT_ROOT
-    / "data"
-    / "patient_records"
-    / "patients.json"
-)
+if os.getenv("HOME") and Path("/home/site/wwwroot").exists():
+    PATIENTS_FILE_PATH = Path("/home/site/wwwroot/data/patient_records/patients.json")
+else:
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+    PATIENTS_FILE_PATH = PROJECT_ROOT / "data" / "patient_records" / "patients.json"
 
 
 # ---------------------------------------------------------

@@ -10,9 +10,12 @@ from core.agent.clinical_agent import ClinicalAgent
 app = FastAPI(title="Clinical Support Agent API")
 agent = ClinicalAgent()
 
-# Absolute path resolution using Pathlib matching core/tools/patient_tool.py
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-PATIENTS_FILE = PROJECT_ROOT / "data" / "patient_records" / "patients.json"
+# Dynamic path resolution: use persistent Azure App Service path if deployed
+if os.getenv("HOME") and Path("/home/site/wwwroot").exists():
+    PATIENTS_FILE = Path("/home/site/wwwroot/data/patient_records/patients.json")
+else:
+    PROJECT_ROOT = Path(__file__).resolve().parents[1]
+    PATIENTS_FILE = PROJECT_ROOT / "data" / "patient_records" / "patients.json"
 
 
 # ---------------------------------------------------------

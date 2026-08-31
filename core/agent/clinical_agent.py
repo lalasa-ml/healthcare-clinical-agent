@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 from openai import AzureOpenAI
 from dotenv import load_dotenv
@@ -400,9 +401,12 @@ class ClinicalAgent:
 
     def _is_patient_specific_query(self, user_query: str) -> bool:
         query = user_query.lower().strip()
+        # Matches explicit patient ID patterns like p-101, p-106, p-107, etc.
+        if re.search(r"\bp-\d+\b", query):
+            return True
+
         patient_indicators = [
-            "patient", "this patient", "the patient", "for p-",
-            "p-101", "p-102", "p-103", "p-104", "p-999",
+            "patient", "this patient", "the patient",
             "their medication", "their medications", "their history",
             "their symptoms", "their allergies", "their lab",
             "their laboratory", "her hba1c", "his hba1c",
@@ -465,10 +469,14 @@ class ClinicalAgent:
             {"role": "user", "content": user_query}
         ]
 
-        if patient_id:
+        # Extract patient ID from query string if available (e.g., P-106)
+        pid_match = re.search(r"\b(P-\d+)\b", user_query, re.IGNORECASE)
+        resolved_pid = patient_id or (pid_match.group(1).upper() if pid_match else None)
+
+        if resolved_pid:
             messages.append({
                 "role": "user",
-                "content": f"Patient ID available for this request: {patient_id}. If patient-specific information is required, use this exact patient ID."
+                "content": f"Patient ID available for this request: {resolved_pid}. If patient-specific information is required, use this exact patient ID."
             })
 
         if not allowed_tools:
@@ -496,10 +504,10 @@ class ClinicalAgent:
             if not assistant_message.tool_calls:
                 return assistant_message.content or "The model returned no response."
 
-            # Convert response message to dict format for robust API message history tracking
+            # Append assistant's tool call message
             messages.append(assistant_message.model_dump())
 
-            # Execute all requested tool calls
+            # Execute requested tool calls
             for tool_call in assistant_message.tool_calls:
                 tool_name = tool_call.function.name
 
@@ -508,8 +516,8 @@ class ClinicalAgent:
                 except json.JSONDecodeError:
                     arguments = {}
 
-                if tool_name == "get_patient_record" and patient_id:
-                    arguments["patient_id"] = patient_id
+                if tool_name == "get_patient_record" and resolved_pid:
+                    arguments["patient_id"] = resolved_pid
 
                 tool_result = self._execute_tool(tool_name, arguments)
 
