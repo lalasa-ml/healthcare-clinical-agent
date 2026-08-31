@@ -1,2 +1,1 @@
-uvicorn app.api:app --reload
-ngrok http 8000
+Try the app live - https://healthcare-clinical-agent-moff9v85dqrb2n8rfhhggo.streamlit.app/
