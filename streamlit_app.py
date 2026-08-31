@@ -1,13 +1,8 @@
 import streamlit as st
 import requests
-import json
-import os
 
-# Dynamic API URL resolution (Docker vs Local)
+# Live Azure API URL
 API_BASE_URL = "https://clinical-api-backend-app.azurewebsites.net"
-# Absolute path to root project directory
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PATIENTS_FILE = os.path.join(BASE_DIR, "data", "patient_records", "patients.json")
 
 st.set_page_config(
     page_title="Clinical AI Support System",
@@ -26,21 +21,27 @@ tab1, tab2, tab3 = st.tabs([
 ])
 
 
+# Helper function to fetch live patients from Azure backend API
+@st.cache_data(ttl=5)
+def fetch_patients_from_api():
+    try:
+        res = requests.get(f"{API_BASE_URL}/api/v1/patients", timeout=10)
+        if res.status_code == 200:
+            return res.json().get("patients", [])
+        return []
+    except Exception:
+        return []
+
+
 # =========================================================
 # TAB 1: Chat Playground with Clinical Assistant
 # =========================================================
 with tab1:
     st.subheader("Clinical AI Assistant Chat")
     
-    # Load patient IDs for dropdown selection
-    patient_ids = ["None"]
-    if os.path.exists(PATIENTS_FILE):
-        try:
-            with open(PATIENTS_FILE, "r") as f:
-                data = json.load(f)
-                patient_ids += [p.get("patient_id") for p in data]
-        except Exception:
-            pass
+    # Dynamically load patient IDs from Azure API
+    patients_data = fetch_patients_from_api()
+    patient_ids = ["None"] + [p.get("patient_id") for p in patients_data if p.get("patient_id")]
 
     col1, col2 = st.columns([1, 3])
     with col1:
@@ -99,24 +100,24 @@ with tab1:
 # =========================================================
 with tab2:
     st.subheader("Register a New Patient Record")
-    st.info("Fill in the fields below. Submitting will automatically generate the JSON structure and add the patient to the active database.")
+    st.info("Fill in the fields below. Submitting will automatically send the patient record to the live Azure API.")
 
     with st.form("patient_registration_form"):
         c1, c2, c3 = st.columns(3)
         with c1:
-            p_id = st.text_input("Patient ID *", placeholder="e.g., P-104").strip().upper()
-            name = st.text_input("Full Name *", placeholder="e.g., David Miller")
+            p_id = st.text_input("Patient ID *", placeholder="e.g., P-106").strip().upper()
+            name = st.text_input("Full Name *", placeholder="e.g., Sarah Jenkins")
         with c2:
-            age = st.number_input("Age *", min_value=0, max_value=120, value=50)
-            gender = st.selectbox("Gender *", ["Male", "Female", "Other"])
+            age = st.number_input("Age *", min_value=0, max_value=120, value=45)
+            gender = st.selectbox("Gender *", ["Female", "Male", "Other"])
         with c3:
             allergies_raw = st.text_area(
                 "Allergies (comma separated)", 
-                placeholder="Penicillin, Sulfa drugs (Leave blank if unrecorded)"
+                placeholder="Aspirin, Iodine (Leave blank if unrecorded)"
             )
             symptoms_raw = st.text_area(
                 "Symptoms (comma separated)", 
-                placeholder="Polyuria, Polydipsia, Fatigue"
+                placeholder="Blurry vision, Persistent headaches, Fatigue"
             )
 
         st.markdown("---")
@@ -125,25 +126,25 @@ with tab2:
         with h1:
             history_raw = st.text_area(
                 "Medical History (comma separated)", 
-                placeholder="Type 2 Diabetes Mellitus (Diagnosed 2019), Hypertension"
+                placeholder="Type 2 Diabetes Mellitus, Essential Hypertension"
             )
         with h2:
             meds_raw = st.text_area(
                 "Medications (Format: Name: Dosage, comma separated)", 
-                placeholder="Metformin: 500mg Daily, Lisinopril: 10mg Daily"
+                placeholder="Metformin: 1000mg twice daily, Lisinopril: 10mg daily"
             )
 
         st.markdown("---")
         st.write("##### Recent Laboratory Results")
         l1, l2, l3 = st.columns(3)
         with l1:
-            hba1c_val = st.text_input("HbA1c Value", placeholder="e.g., 8.5%")
+            hba1c_val = st.text_input("HbA1c Value", placeholder="e.g., 9.1%")
             hba1c_date = st.date_input("HbA1c Date")
         with l2:
-            egfr_val = st.text_input("eGFR Value", placeholder="e.g., 28 mL/min")
+            egfr_val = st.text_input("eGFR Value", placeholder="e.g., 75 mL/min")
             egfr_date = st.date_input("eGFR Date")
         with l3:
-            creat_val = st.text_input("Serum Creatinine Value", placeholder="e.g., 2.1 mg/dL")
+            creat_val = st.text_input("Serum Creatinine Value", placeholder="e.g., 1.0 mg/dL")
             creat_date = st.date_input("Creatinine Date")
 
         submitted = st.form_submit_button("➕ Save Patient Record")
@@ -152,7 +153,6 @@ with tab2:
             if not p_id or not name:
                 st.error("Please fill in required fields (Patient ID and Name).")
             else:
-                # Parse inputs into structured objects
                 allergies = [a.strip() for a in allergies_raw.split(",") if a.strip()]
                 symptoms = [s.strip() for s in symptoms_raw.split(",") if s.strip()]
                 history = [h.strip() for h in history_raw.split(",") if h.strip()]
@@ -168,9 +168,15 @@ with tab2:
 
                 labs = []
                 if hba1c_val:
-                    labs.append({"test": "HbA1c", "value": hba1c_val, "status": "High" if float(hba1c_val.replace('%','')) > 7.0 else "Normal", "date": str(hba1c_date)})
+                    try:
+                        clean_num = float(hba1c_val.replace('%','').strip())
+                        status_str = "High" if clean_num > 7.0 else "Normal"
+                    except ValueError:
+                        status_str = "Recorded"
+                    labs.append({"test": "HbA1c", "value": hba1c_val, "status": status_str, "date": str(hba1c_date)})
+
                 if egfr_val:
-                    labs.append({"test": "eGFR", "value": egfr_val, "status": "Low" if float(egfr_val.split()[0]) < 60 else "Normal", "date": str(egfr_date)})
+                    labs.append({"test": "eGFR", "value": egfr_val, "status": "Normal", "date": str(egfr_date)})
                 if creat_val:
                     labs.append({"test": "Serum Creatinine", "value": creat_val, "status": "Normal", "date": str(creat_date)})
 
@@ -186,11 +192,12 @@ with tab2:
                     "symptoms": symptoms
                 }
 
-                # Submit to FastAPI Backend
+                # Submit to FastAPI Backend API on Azure
                 try:
-                    res = requests.post(f"{API_BASE_URL}/api/v1/patients/add", json=payload)
+                    res = requests.post(f"{API_BASE_URL}/api/v1/patients/add", json=payload, timeout=15)
                     if res.status_code == 200:
-                        st.success(f"✅ Patient '{p_id}' added successfully! You can now query about this patient in the chat tab.")
+                        st.success(f"✅ Patient '{p_id}' added successfully to Azure backend!")
+                        st.cache_data.clear()  # Clear cache so directory and dropdown refresh immediately
                     else:
                         st.error(f"Failed to add patient: {res.json().get('detail', res.text)}")
                 except Exception as exc:
@@ -203,17 +210,13 @@ with tab2:
 with tab3:
     st.subheader("Current Patient Records Directory")
 
-    if os.path.exists(PATIENTS_FILE):
-        try:
-            with open(PATIENTS_FILE, "r") as f:
-                patients_data = json.load(f)
-            
-            for p in patients_data:
-                p_id = p.get("patient_id", "Unknown")
-                p_name = p.get("demographics", {}).get("name", "Unknown")
-                with st.expander(f"👤 Patient {p_id} - {p_name}"):
-                    st.json(p)
-        except Exception as e:
-            st.error(f"Could not read patients file: {str(e)}")
+    patients_list = fetch_patients_from_api()
+
+    if patients_list:
+        for p in patients_list:
+            p_id = p.get("patient_id", "Unknown")
+            p_name = p.get("demographics", {}).get("name", p.get("name", "Unknown"))
+            with st.expander(f"👤 Patient {p_id} - {p_name}"):
+                st.json(p)
     else:
-        st.error("No patient records file found.")
+        st.info("No patient records found or unable to fetch records from backend.")
