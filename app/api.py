@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -9,9 +10,9 @@ from core.agent.clinical_agent import ClinicalAgent
 app = FastAPI(title="Clinical Support Agent API")
 agent = ClinicalAgent()
 
-# Absolute path resolution ensuring reliability across local and containerized environments
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PATIENTS_FILE = os.path.join(BASE_DIR, "data", "patient_records", "patients.json")
+# Absolute path resolution using Pathlib matching core/tools/patient_tool.py
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PATIENTS_FILE = PROJECT_ROOT / "data" / "patient_records" / "patients.json"
 
 
 # ---------------------------------------------------------
@@ -45,8 +46,39 @@ class QueryRequest(BaseModel):
 
 
 # ---------------------------------------------------------
+# Helper Functions
+# ---------------------------------------------------------
+
+def load_patients_from_file() -> list:
+    if not PATIENTS_FILE.exists():
+        return []
+    try:
+        with open(PATIENTS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+
+def save_patients_to_file(patients: list) -> None:
+    PATIENTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(PATIENTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(patients, f, indent=2)
+
+
+# ---------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------
+
+@app.get("/api/v1/patients")
+def get_all_patients():
+    """Retrieve all patients for the Streamlit directory view."""
+    try:
+        patients = load_patients_from_file()
+        return {"status": "success", "count": len(patients), "patients": patients}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
 
 @app.post("/api/v1/agent/query")
 def run_agent_query(request: QueryRequest):
@@ -67,26 +99,20 @@ def run_agent_query(request: QueryRequest):
 @app.post("/api/v1/patients/add")
 def add_patient(patient: PatientCreateRequest):
     try:
-        patients = []
-        
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(PATIENTS_FILE), exist_ok=True)
-
-        if os.path.exists(PATIENTS_FILE):
-            with open(PATIENTS_FILE, "r") as f:
-                patients = json.load(f)
+        patients = load_patients_from_file()
+        pid = patient.patient_id.strip().upper()
 
         # Check for duplicate Patient ID
         for p in patients:
-            if p.get("patient_id", "").upper() == patient.patient_id.upper():
+            if str(p.get("patient_id", "")).strip().upper() == pid:
                 raise HTTPException(
                     status_code=400, 
-                    detail=f"Patient ID '{patient.patient_id}' already exists!"
+                    detail=f"Patient ID '{pid}' already exists!"
                 )
 
-        # Format new patient entry using Pydantic V2 model_dump()
+        # Format new patient entry
         new_patient = {
-            "patient_id": patient.patient_id.upper(),
+            "patient_id": pid,
             "demographics": {
                 "name": patient.name,
                 "age": patient.age,
@@ -100,14 +126,11 @@ def add_patient(patient: PatientCreateRequest):
         }
 
         patients.append(new_patient)
-
-        # Write back updated patient array to patients.json
-        with open(PATIENTS_FILE, "w") as f:
-            json.dump(patients, f, indent=2)
+        save_patients_to_file(patients)
 
         return {
             "status": "success",
-            "message": f"Patient {patient.patient_id.upper()} added successfully!"
+            "message": f"Patient {pid} added successfully!"
         }
     except HTTPException:
         raise
