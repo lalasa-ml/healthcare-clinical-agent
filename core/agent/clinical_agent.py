@@ -370,7 +370,11 @@ class ClinicalAgent:
         endpoint = os.getenv("AZURE_OPENAI_ENDPOINT", "").strip()
         api_key = os.getenv("AZURE_OPENAI_API_KEY", "").strip()
         api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview").strip()
-        self.deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT", "").strip()
+        self.deployment_name = (
+            os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "") or 
+            os.getenv("AZURE_OPENAI_DEPLOYMENT", "") or 
+            os.getenv("MODEL_DEPLOYMENT_NAME", "gpt-4.1-mini")
+        ).strip()
 
         self.client = None
 
