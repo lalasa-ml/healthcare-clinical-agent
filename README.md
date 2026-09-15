@@ -60,29 +60,32 @@ Unlike traditional single-pass LLM wrappers (which simply output text from memor
 
 ## 📂 Project Structure
 
+```text
 healthcare-clinical-agent/
 ├── app/
-│   ├── init.py
+│   ├── __init__.py
 │   ├── api.py                  # FastAPI server, REST endpoints, persistent storage logic
 │   └── main.py                 # CLI entrypoint for testing
 ├── core/
-│   ├── init.py
+│   ├── __init__.py
+│   ├── config.py               # Core configuration & environment settings
 │   ├── agent/
-│   │   ├── init.py
+│   │   ├── __init__.py
 │   │   └── clinical_agent.py   # Multi-tool agent loop, Azure OpenAI integration, safety rules
 │   └── tools/
-│       ├── init.py
+│       ├── __init__.py
 │       ├── patient_tool.py     # Patient lookup tool & case-insensitive ID resolution
 │       └── guidelines_tool.py  # Clinical hospital protocol lookup engine
 ├── data/
+│   ├── guidelines/
+│   │   └── diabetes_protocol.txt # Clinical guideline protocol document
 │   └── patient_records/
 │       └── patients.json       # Persistent patient database
 ├── streamlit_app.py            # Multi-tab Streamlit web GUI
 ├── requirements.txt            # Python dependencies
 ├── .env                        # Local environment variables
 └── README.md                   # Project documentation
-
-
+```
 ---
 
 ## 🧪 Verified Test Scenarios
