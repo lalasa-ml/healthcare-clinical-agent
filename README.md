@@ -34,49 +34,7 @@ The **Healthcare Clinical Support Agent** is a cloud-hosted, agentic AI decision
 ## 🏗️ Architectural Overview & Data Flow
 
 The project is built as a **decoupled, two-tier cloud architecture**:
-+─────────────────────────────────────────────────────────+
-|                 1. PRESENTATION LAYER                   |
-|              (Streamlit Cloud UI Workspace)             |
-|                                                         |
-| [ Physician Chat ]  [ Add Patient ]  [ Directory View ] |
-+────────────────────────────┬────────────────────────────+
-                             │
-                  HTTPS REST API Request
-                             │
-                             v
-+─────────────────────────────────────────────────────────+
-|                   2. BACKEND SERVICE                    |
-|                (FastAPI App on Azure)                   |
-|                                                         |
-|  - GET /patients   : Load Directory List                |
-|  - POST /add       : Validate & Store New Patient       |
-|  - POST /query     : Trigger Clinical Agent Execution   |
-+────────────────────────────┬────────────────────────────+
-                             │
-                     Executes Agent Engine
-                             │
-                             v
-+─────────────────────────────────────────────────────────+
-|              3. CLINICAL AGENT ENGINE                   |
-|               (Intent & Pre-Filtering)                  |
-|                                                         |
-|  Step A: Regex Query Pre-Filter (_select_allowed_tools) |
-|  Step B: Case-Insensitive Patient ID Extractor          |
-|  Step C: Tool Call Selector & Decision Loop             |
-+───────────────────┬─────────────────┬───────────────────+
-                    │                 │
-            Read/Write JSON      HTTP REST API Call
-                    │                 │
-                    v                 v
-+───────────────────────+   +─────────────────────────────+
-| 4. PERSISTENT STORAGE |   |     5. AI REASONING MODEL   |
-| (Azure App Service)   |   |     (Azure OpenAI SDK)      |
-|                       |   |                             |
-| Path:                 |   |  - Select Tool Functions    |
-| /home/site/wwwroot/   |   |  - Evaluate Guidelines      |
-| data/patient_records/ |   |  - Synthesize Clinical      |
-| patients.json         |   |    Response Payload         |
-+───────────────────────+   +─────────────────────────────+
+<img width="1214" height="1295" alt="image" src="https://github.com/user-attachments/assets/fe934cd3-57a0-444f-94ec-e8ca1d832602" />
 
 ---
 
